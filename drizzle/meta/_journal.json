@@ -1,0 +1,76 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1794241909683,
+      "tag": "0001_initial",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1794241909683,
+      "tag": "0002_editions_and_events",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1794242642758,
+      "tag": "0003_add_occurred_to_events",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1794245181078,
+      "tag": "0004_add_pipeline_fields_and_edition_meta",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1794247429416,
+      "tag": "0005_add_detail_and_source_url_to_events",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1794278459037,
+      "tag": "0006_add_city_photos_cache",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1794934336732,
+      "tag": "0007_add_flight_photos_cache",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1794935209602,
+      "tag": "0008_add_flight_routes_cache",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1794936266380,
+      "tag": "0009_add_flight_aircraft_cache",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1795007653951,
+      "tag": "0010_add_ship_photos_cache",
+      "breakpoints": true
+    }
+  ]
+}
