@@ -1,0 +1,288 @@
+/* Command-center theme: this page is a dark intel console by design (the
+   reference is a deep-black situation-awareness desk), in both system modes. */
+@import "tailwindcss";
+@import "tailwindcss-safe-area";
+
+@theme {
+  --text-xs: 12px;
+  --text-xs--line-height: 16px;
+  --text-sm: 14px;
+  --text-sm--line-height: 20px;
+  --text-base: 16px;
+  --text-base--line-height: 24px;
+  --text-lg: 18px;
+  --text-lg--line-height: 28px;
+  --text-xl: 20px;
+  --text-xl--line-height: 28px;
+  --text-2xl: 24px;
+  --text-2xl--line-height: 32px;
+  --text-3xl: 30px;
+  --text-3xl--line-height: 36px;
+}
+
+:root {
+  color-scheme: dark;
+  --bg: #000000;
+  --surface: #0a1017;
+  --surface2: #0d1622;
+  --text: #e8f1f8;
+  --dim: #7d93a8;
+  --border: #1c2a38;
+  --accent: #22d3ee;
+  --danger: #ff3b30;
+  --gold: #e8b33a;
+  --radius: 4px;
+  --space-surface: var(--surface);
+  --space-surface-alt: var(--surface2);
+  --space-muted: var(--dim);
+  --space-border: var(--border);
+  --space-accent: var(--accent);
+}
+
+/* Pull-to-refresh defence, round 6 — the strategy FLIPS. Rounds 1–5
+   locked the document down (position:fixed, overflow:hidden, zero
+   scrollable distance) and pinned a private inner shell at ~1px.
+   The user's 2026-11-18 real-device recording proved that does not
+   stop the host WebView: it judges "at top" from the DOCUMENT's own
+   scroll position (window.scrollY stayed 0 forever inside the fixed
+   frame), so its pull-to-refresh kept arming and the page reloaded
+   mid-drag. Round 6 therefore gives the DOCUMENT ITSELF the tiny
+   scrollable range: html/body and the app roots are ordinary flow
+   boxes again, the app content is ~2px taller than the viewport
+   (the [data-scroll-shell] spacer in App.tsx) with the stage sticky
+   inside it, and App.tsx's scroll listener keeps window.scrollY
+   pinned at ≥1px — the moment anything settles it back to 0 it is
+   re-pinned — so the host never sees an at-top document. Nothing
+   visibly moves: 2px of range under a sticky stage is invisible.
+   overscroll-behavior:none and touch-action:none stay as auxiliary
+   layers (no native pan ever actually scrolls the document; the pin
+   is programmatic), and the only real scrolling left is inside
+   [data-scroll-allow] regions, guarded by App.tsx's edge-aware
+   touchmove handler. */
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+  overscroll-behavior: none;
+  overscroll-behavior-y: none;
+  background: #000000;
+  /* The root itself also refuses native touch panning — the first
+     of the touch-action layers (root → shell → stage → canvas),
+     with [data-scroll-allow] the only pan-y opt-in. */
+  touch-action: none;
+}
+.hatch-space-root[data-hatch-space-root],
+[data-generated-space-root] {
+  /* Round 6: ordinary flow boxes (see the html/body note) — NOT
+     fixed, NOT height-clamped, NOT overflow-clipped, or the
+     document could not own its 2px scroll range. The selector
+     carries the same weight as the SDK's own root styles so this
+     posture wins. */
+  position: relative;
+  inset: auto;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  overflow: visible;
+  overscroll-behavior: none;
+  overscroll-behavior-y: none;
+  /* The whole app surface refuses native touch panning; see
+     [data-scroll-allow] below for the one opt-back-in. */
+  touch-action: none;
+}
+
+/* Internal scrollers must never chain their overscroll to the host:
+   when a card/list is scrolled to its top edge and the finger keeps
+   pulling down, the default scroll chaining hands the gesture to the
+   page/host — which is exactly how a pull-to-refresh gets armed from
+   inside a weather card. `none` keeps every pixel of the gesture
+   inside the scroller itself; the scroller still scrolls normally.
+   Round 5 adds touch-action: pan-y — these containers explicitly
+   keep native VERTICAL touch scrolling for themselves (the stage
+   root is touch-action:none; per the intersection rule a gesture
+   handled by a scroll container is governed by the values up to
+   that container, so pan-y here is what keeps card/list scrolling
+   alive), while horizontal panning — the direction that could be
+   reinterpreted — stays refused. */
+[data-scroll-allow] {
+  overscroll-behavior: none;
+  overscroll-behavior-y: none;
+  touch-action: pan-y;
+}
+
+/* Fullscreen roots (edit #22): in portrait fullscreen the visible
+   "page" IS the fullscreen container — the native fullscreen element
+   (documentElement, via :fullscreen) or the immersive fallback root
+   ([data-fs-root]) — so the fixed-shell defence is restated on those
+   roots themselves, not just on html/body in the framed layout.
+   touch-action:none on the root stops the browser turning any drag
+   that starts on fullscreen chrome (badges, control stack, panel
+   backdrop) into a scroll/pull gesture; the internal scrollers are
+   their own scroll containers and keep scrolling under it. */
+:fullscreen,
+:-webkit-full-screen {
+  /* Round 6: NOT position:fixed / overflow:hidden — in native
+     fullscreen the documentElement IS the fullscreen element, and
+     locking it would hand the host back the permanently-at-top
+     document whose scrollY==0 kept arming pull-to-refresh. The
+     document keeps its ~2px scroll range (and App.tsx's ≥1px pin)
+     in fullscreen exactly as in framed mode. */
+  width: 100%;
+  overscroll-behavior: none;
+  overscroll-behavior-y: none;
+  touch-action: none;
+  background: #000000;
+}
+/* Round 4 (scrollable shell): [data-fs-root] is the STICKY STAGE
+   inside the scrollable shell, so it must NOT be position:fixed —
+   fixing it would tear the stage out of the scroller and hand the
+   host back the fully-unscrollable page whose "always at top" state
+   kept arming its pull-to-refresh. The stage keeps only the gesture
+   locks here; its sticky placement and 100dvh height come from
+   App.tsx classes, and the shell (below) supplies the real scroll
+   margin in fullscreen exactly as in framed mode. */
+[data-fs-root="true"] {
+  overflow: hidden;
+  overscroll-behavior: none;
+  overscroll-behavior-y: none;
+  touch-action: none;
+}
+
+/* App shell (round 6): in framed mode this is a plain flow wrapper
+   whose single spacer child is ~2px taller than the viewport — that
+   2px is the DOCUMENT's scroll range now (see the html/body note
+   above), and the stage inside is sticky so nothing visibly moves.
+   Only in immersive (pseudo) fullscreen does the shell become a
+   scroller itself (fixed inset-0 + overflow-y:auto from App.tsx),
+   keeping the same 2px margin inside fullscreen; App.tsx pins
+   whichever scroller is live at ≥1px. Scrollbars stay hidden: a
+   near-full-height 2px-range bar would only read as a glitch.
+   overscroll-behavior:none keeps any edge overscroll from chaining
+   to the host. */
+[data-scroll-shell] {
+  overscroll-behavior: none;
+  overscroll-behavior-y: none;
+  scrollbar-width: none;
+  touch-action: none;
+}
+[data-scroll-shell]::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.font-console {
+  font-family:
+    ui-monospace, "JetBrains Mono", SFMono-Regular, Menlo, Consolas,
+    "Liberation Mono", monospace;
+}
+
+/* Thin console scrollbar for the feed column. */
+.console-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #22374a transparent;
+}
+.console-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+.console-scroll::-webkit-scrollbar-thumb {
+  background: #22374a;
+}
+
+@keyframes feed-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.feed-in {
+  animation: feed-in 0.28s cubic-bezier(0.22, 0.9, 0.3, 1) both;
+}
+
+/* Card entrance: opacity only, 240ms — safe on elements that also carry
+   a positioning transform (the desktop weather card centers itself with
+   -translate-y-1/2, which a transform animation would override). */
+@keyframes card-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.card-in {
+  animation: card-in 0.24s ease-out both;
+}
+
+/* Loading spinner ring (edit #27): used by the App loading veil.
+   The static boot splash in client/index.html carries its own inline
+   copy of this animation (it must paint before any bundled CSS/JS
+   exists); the two are deliberately the same visual. Rotation is a
+   composited transform, so the ring keeps turning even while the
+   main thread is busy with the Globe's init work. */
+@keyframes boot-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.boot-spinner {
+  border: 3px solid rgba(125, 147, 168, 0.25);
+  border-top-color: var(--accent);
+  animation: boot-spin 0.9s linear infinite;
+}
+
+/* Slow-load progress creep (loading veil, >5s): used only until the
+   Globe's first real texture-progress report arrives, so the bar
+   eases toward 85% over ~20s and never claims a number it doesn't
+   have; once a real fraction exists App swaps in a determinate bar. */
+@keyframes load-creep {
+  from {
+    width: 4%;
+  }
+  to {
+    width: 85%;
+  }
+}
+.load-creep-bar {
+  width: 4%;
+  animation: load-creep 20s cubic-bezier(0.15, 0.6, 0.25, 1) forwards;
+}
+
+@keyframes blink-dot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+.blink-dot {
+  animation: blink-dot 1.6s ease-in-out infinite;
+}
+
+/* BREAKING badge: solid red chip that blinks — separate from the category
+   color system, so a breaking story keeps its category color everywhere. */
+.breaking-badge {
+  background: var(--danger);
+  animation: blink-dot 1.1s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feed-in,
+  .card-in,
+  .blink-dot,
+  .breaking-badge,
+  .boot-spinner {
+    animation: none;
+  }
+  .load-creep-bar {
+    animation: none;
+    width: 40%;
+  }
+}
