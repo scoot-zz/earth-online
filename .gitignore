@@ -1,0 +1,16 @@
+# 环境变量与密钥（切勿提交真实 Key）
+.env
+.env.*
+
+# 依赖与构建产物
+node_modules/
+client/dist/
+client/dist-cvm/
+server/dist/
+.space-build/
+
+# 运行时数据
+app.db
+*.db-journal
+audits/
+.harness/
