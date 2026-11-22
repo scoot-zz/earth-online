@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <meta name="color-scheme" content="light dark" />
+    <!-- Empty inline icon: stops the browser fetching /favicon.ico, which
+         lives outside the space's routes and fails auth. -->
+    <link rel="icon" href="data:," />
+    <title>地球Online · 每日大事</title>
+    <!-- Boot splash (edit #27): pure static HTML/CSS inside the mount
+         div below. It paints with the document's first paint — before
+         the deferred module script (several MB inlined) has even
+         parsed, let alone executed — so a cold open shows the app
+         name + spinner immediately instead of seconds of blank.
+         React's createRoot replaces this content on first commit;
+         the App's own loading veil then covers until the globe's
+         first frame. Inline styles only: no bundled CSS exists yet
+         at this point in the page's life. -->
+    <style>
+      html,
+      body {
+        background: #05080c;
+        margin: 0;
+        padding: 0;
+      }
+      .boot-splash {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 18px;
+        background: #04070b;
+        color: #e8f1f8;
+        font-family:
+          ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      }
+      .boot-splash .boot-name {
+        font-size: 15px;
+        font-weight: 600;
+        letter-spacing: 0.22em;
+      }
+      .boot-splash .boot-ring {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        border: 3px solid rgba(125, 147, 168, 0.25);
+        border-top-color: #22d3ee;
+        animation: boot-spin 0.9s linear infinite;
+      }
+      .boot-splash .boot-text {
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        color: #7d93a8;
+      }
+      /* Slow-load progress bar: pure CSS, timed from first paint —
+         it (and the 较慢 caption) stay invisible for the first 5s
+         and fade in only if the bundle is STILL loading then, so a
+         fast open never flashes it. Indeterminate slide: this layer
+         has no real progress signal (the App veil takes over with
+         the Globe's real texture fraction once React mounts). */
+      .boot-splash .boot-bar-wrap {
+        width: 180px;
+        height: 4px;
+        border-radius: 999px;
+        background: rgba(125, 147, 168, 0.18);
+        overflow: hidden;
+        opacity: 0;
+        animation: boot-bar-in 0.3s ease 5s forwards;
+      }
+      .boot-splash .boot-bar {
+        height: 100%;
+        width: 40%;
+        border-radius: 999px;
+        background: #22d3ee;
+        animation: boot-bar-slide 1.15s ease-in-out 5s infinite;
+      }
+      .boot-splash .boot-slow {
+        font-size: 11px;
+        letter-spacing: 0.16em;
+        color: #7d93a8;
+        opacity: 0;
+        animation: boot-bar-in 0.3s ease 5s forwards;
+      }
+      @keyframes boot-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @keyframes boot-bar-in {
+        to {
+          opacity: 1;
+        }
+      }
+      @keyframes boot-bar-slide {
+        from {
+          transform: translateX(-110%);
+        }
+        to {
+          transform: translateX(280%);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .boot-splash .boot-ring {
+          animation: none;
+        }
+        .boot-splash .boot-bar {
+          animation: none;
+          width: 60%;
+        }
+      }
+    </style>
+    <script src="./src/main.tsx" type="module"></script>
+  </head>
+  <body>
+    <div
+      data-generated-space-root=""
+      data-generated-space-slug="di-qiu-online-mei-ri-da-shi"
+    >
+      <div class="boot-splash" role="status" aria-label="地球仪正在加载">
+        <div class="boot-name">地球Online · 全球天气</div>
+        <div class="boot-ring" aria-hidden="true"></div>
+        <div class="boot-text">正在加载地球…</div>
+        <div class="boot-bar-wrap" aria-hidden="true"><div class="boot-bar"></div></div>
+        <div class="boot-slow">网络较慢，仍在加载…</div>
+      </div>
+    </div>
+  </body>
+</html>
